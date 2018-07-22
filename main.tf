@@ -2,6 +2,16 @@ provider "aws" {
   region  = "${var.aws_region}"
   profile = "${var.profile}"
 }
+
+resource "aws_internet_gateway" "internet_gateway" {
+  vpc_id = "${var.vpc_id}"
+
+  tags {
+    Name        = "${var.name}"
+    Environment = "${var.environment}"
+  }
+}
+
 resource "aws_subnet" "public" {
   vpc_id            = "${var.vpc_id}"
   cidr_block        = "${element(keys (var.public_subnets), count.index)}"
@@ -10,15 +20,6 @@ resource "aws_subnet" "public" {
 
  tags {
     Name        = "${format("%s-%s-public-%s-%d", var.name, lookup(var.public_subnets, element(keys(var.public_subnets), count.index)), element(split("-", element(var.availability_zones, count.index)),2), count.index+1)}"
-    Environment = "${var.environment}"
-  }
-}
-
-resource "aws_internet_gateway" "internet_gateway" {
-  vpc_id = "${var.vpc_id}"
-
-  tags {
-    Name        = "${var.name}"
     Environment = "${var.environment}"
   }
 }
